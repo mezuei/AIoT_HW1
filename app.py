@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify
 import os
 
 app = Flask(__name__)
-DB_FILE = "aiotdb.db"
+DB_FILE = "aiotdb2.db"
 
 def init_db():
     conn = sqlite3.connect(DB_FILE)

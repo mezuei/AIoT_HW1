@@ -4,7 +4,7 @@ import pandas as pd
 import time
 import os
 
-DB_FILE = "aiotdb.db"
+DB_FILE = "aiotdb2.db"
 
 st.set_page_config(page_title="AIoT Dashboard", layout="wide")
 st.title("📟 ESP32 Sensor Dashboard (DHT11 Data)")
