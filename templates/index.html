@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sensor Random Number Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d1117;
+      --card:      #161b22;
+      --border:    #30363d;
+      --accent:    #58a6ff;
+      --accent2:   #bc8cff;
+      --success:   #3fb950;
+      --danger:    #f85149;
+      --info:      #58a6ff;
+      --text:      #e6edf3;
+      --muted:     #8b949e;
+      --radius:    12px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1rem 4rem;
+    }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    header p { color: var(--muted); margin-top: .4rem; font-size: .95rem; }
+
+    /* ── Alerts ── */
+    .alerts { max-width: 900px; margin: 0 auto 1.5rem; }
+    .alert {
+      padding: .8rem 1.2rem;
+      border-radius: var(--radius);
+      margin-bottom: .6rem;
+      font-size: .9rem;
+      border-left: 4px solid;
+    }
+    .alert-success { background: #122313; border-color: var(--success); color: var(--success); }
+    .alert-danger   { background: #1f0a0a; border-color: var(--danger);  color: var(--danger);  }
+    .alert-info     { background: #0d1f33; border-color: var(--info);    color: var(--info);    }
+
+    /* ── Error banner ── */
+    .error-banner {
+      max-width: 900px; margin: 0 auto 1.5rem;
+      background: #1f0a0a; border: 1px solid var(--danger);
+      border-radius: var(--radius); padding: 1rem 1.4rem;
+      color: var(--danger);
+    }
+
+    /* ── Stats bar ── */
+    .stats {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      max-width: 900px; margin: 0 auto 1.5rem;
+    }
+    .stat-card {
+      flex: 1; min-width: 140px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1rem 1.4rem;
+    }
+    .stat-card .label { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+    .stat-card .value { font-size: 1.8rem; font-weight: 700; margin-top: .2rem; }
+    .stat-card .value.blue   { color: var(--accent); }
+    .stat-card .value.purple { color: var(--accent2); }
+    .stat-card .value.green  { color: var(--success); }
+
+    /* ── Action buttons ── */
+    .actions {
+      display: flex; gap: .8rem; flex-wrap: wrap;
+      max-width: 900px; margin: 0 auto 1.8rem;
+    }
+    form { display: inline; }
+    .btn {
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .6rem 1.4rem; border-radius: 8px;
+      font-size: .9rem; font-weight: 600; cursor: pointer;
+      border: none; transition: opacity .15s, transform .1s;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; }
+    .btn-danger  { background: var(--danger); color: #fff; }
+    .btn:hover   { opacity: .85; }
+
+    /* ── Table wrapper ── */
+    .table-wrap {
+      max-width: 900px; margin: 0 auto;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+    }
+    .table-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1rem 1.4rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .table-header h2 { font-size: 1rem; font-weight: 600; }
+    .badge {
+      background: var(--border); color: var(--muted);
+      font-size: .75rem; padding: .2rem .6rem; border-radius: 20px;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      text-align: left; padding: .7rem 1.4rem;
+      font-size: .75rem; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .06em;
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr { transition: background .1s; }
+    tbody tr:hover { background: rgba(255,255,255,.04); }
+    tbody td {
+      padding: .75rem 1.4rem;
+      font-size: .9rem;
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .id-cell   { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .value-cell {
+      font-variant-numeric: tabular-nums; font-weight: 600;
+      color: var(--accent);
+    }
+    .value-bar {
+      display: inline-block;
+      height: 6px; border-radius: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      vertical-align: middle; margin-left: .5rem; opacity: .5;
+    }
+    .time-cell { color: var(--muted); font-size: .82rem; }
+
+    .empty-state {
+      text-align: center; padding: 3rem; color: var(--muted);
+    }
+    .empty-state svg { margin-bottom: .8rem; opacity: .4; }
+
+    footer { text-align: center; margin-top: 2rem; color: var(--muted); font-size: .8rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🎲 Sensor Random Number Generator</h1>
+  <p>Flask &plus; MySQL — <code>sensors</code> table</p>
+</header>
+
+<!-- Flash messages -->
+{% if get_flashed_messages() %}
+<div class="alerts">
+  {% for category, message in get_flashed_messages(with_categories=true) %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- DB error banner -->
+{% if error %}
+<div class="error-banner">
+  <strong>⚠ Database Error:</strong> {{ error }}<br>
+  <small>Check that MySQL is running and your credentials in <code>app.py → DB_CONFIG</code> are correct.</small>
+</div>
+{% endif %}
+
+<!-- Stats -->
+{% if rows %}
+{% set values = rows | map(attribute='value') | list %}
+{% set total  = values | sum %}
+{% set avg    = (total / rows|length) | round(1) %}
+{% set maxv   = values | max %}
+<div class="stats">
+  <div class="stat-card">
+    <div class="label">Total Rows</div>
+    <div class="value blue">{{ rows | length }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Average</div>
+    <div class="value purple">{{ avg }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Max Value</div>
+    <div class="value green">{{ maxv }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Total Sum</div>
+    <div class="value blue">{{ total }}</div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Actions -->
+<div class="actions">
+  <form action="/generate" method="post">
+    <button class="btn btn-primary" type="submit">
+      ➕ Insert Random Number
+    </button>
+  </form>
+  <form action="/clear" method="post">
+    <button class="btn btn-danger" type="submit"
+      onclick="return confirm('Reset table with 30 fresh random numbers?')">
+      🔄 Reset &amp; Re-seed 30 Rows
+    </button>
+  </form>
+</div>
+
+<!-- Table -->
+<div class="table-wrap">
+  <div class="table-header">
+    <h2>sensors</h2>
+    <span class="badge">{{ rows | length }} record{{ 's' if rows | length != 1 }}</span>
+  </div>
+
+  {% if rows %}
+  {% set maxv = rows | map(attribute='value') | max %}
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Value</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td class="id-cell">#{{ row.id }}</td>
+        <td class="value-cell">
+          {{ row.value }}
+          <span class="value-bar" style="width:{{ [(row.value / maxv * 80)|int, 4]|max }}px"></span>
+        </td>
+        <td class="time-cell">{{ row.time }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4"/>
+    </svg>
+    <p>No records yet. Hit <strong>Insert Random Number</strong> to add some!</p>
+  </div>
+  {% endif %}
+</div>
+
+<footer>DIC4 · Sensors Demo · {{ rows | length }} row{{ 's' if rows | length != 1 }}</footer>
+
+</body>
+</html>

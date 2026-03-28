@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Highcharts Random Numbers</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Highcharts (local bundle) -->
+    <script src="/static/js/highcharts.js"></script>
+    <script src="/static/js/exporting.js"></script>
+    <script src="/static/js/accessibility.js"></script>
+
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #0d1117;
+            --card: #161b22;
+            --border: #30363d;
+            --accent: #58a6ff;
+            --accent2: #bc8cff;
+            --success: #3fb950;
+            --text: #e6edf3;
+            --muted: #8b949e;
+            --radius: 14px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        /* ── Header ── */
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        header p {
+            color: var(--muted);
+            margin-top: .35rem;
+            font-size: .95rem;
+        }
+
+        /* ── Badge row (the 20 numbers) ── */
+        .number-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            justify-content: center;
+            max-width: 960px;
+            margin: 0 auto 2rem;
+        }
+
+        .num-badge {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: .3rem .65rem;
+            font-size: .82rem;
+            font-weight: 600;
+            color: var(--accent);
+            font-variant-numeric: tabular-nums;
+            transition: background .15s;
+        }
+
+        .num-badge:hover {
+            background: #1f2937;
+        }
+
+        /* ── Controls ── */
+        .controls {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .6rem 1.6rem;
+            border-radius: 8px;
+            font-size: .9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: opacity .15s, transform .1s;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+        }
+
+        .btn:active {
+            transform: scale(.97);
+        }
+
+        .btn:hover {
+            opacity: .85;
+        }
+
+        .btn.loading {
+            opacity: .6;
+            pointer-events: none;
+        }
+
+        /* ── Charts grid ── */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, .4);
+        }
+
+        .chart-card-label {
+            font-size: .72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: var(--muted);
+            margin-bottom: .5rem;
+            padding: 0 .4rem;
+        }
+
+        .badge-fn {
+            display: inline-block;
+            background: rgba(88, 166, 255, .12);
+            border: 1px solid rgba(88, 166, 255, .3);
+            color: var(--accent);
+            font-size: .7rem;
+            border-radius: 4px;
+            padding: .1rem .4rem;
+            margin-left: .4rem;
+            font-family: monospace;
+        }
+
+        #bar-container,
+        #pie-container {
+            height: 380px;
+        }
+
+        /* ── Stats strip ── */
+        .stats {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 960px;
+            margin: 0 auto 2rem;
+        }
+
+        .stat {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: .7rem 1.2rem;
+            text-align: center;
+            flex: 1;
+            min-width: 110px;
+        }
+
+        .stat .lbl {
+            font-size: .7rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .07em;
+        }
+
+        .stat .val {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: .15rem;
+        }
+
+        .stat .val.blue {
+            color: var(--accent);
+        }
+
+        .stat .val.purple {
+            color: var(--accent2);
+        }
+
+        .stat .val.green {
+            color: var(--success);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: var(--muted);
+            font-size: .78rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>🎲 Highcharts Random Number Generator</h1>
+        <p>Flask + <code>python-highcharts</code> — 20 random numbers visualised</p>
+    </header>
+
+    <!-- Stats -->
+    <div class="stats" id="stats">
+        {% set total = numbers | sum %}
+        {% set avg = (total / numbers|length) | round(1) %}
+        <div class="stat">
+            <div class="lbl">Count</div>
+            <div class="val blue">{{ numbers | length }}</div>
+        </div>
+        <div class="stat">
+            <div class="lbl">Min</div>
+            <div class="val purple">{{ numbers | min }}</div>
+        </div>
+        <div class="stat">
+            <div class="lbl">Max</div>
+            <div class="val green">{{ numbers | max }}</div>
+        </div>
+        <div class="stat">
+            <div class="lbl">Avg</div>
+            <div class="val blue">{{ avg }}</div>
+        </div>
+        <div class="stat">
+            <div class="lbl">Sum</div>
+            <div class="val purple">{{ total }}</div>
+        </div>
+    </div>
+
+    <!-- Number badges -->
+    <div class="number-row" id="number-row">
+        {% for n in numbers %}
+        <span class="num-badge">{{ n }}</span>
+        {% endfor %}
+    </div>
+
+    <!-- Refresh button -->
+    <div class="controls">
+        <button class="btn" id="refresh-btn" onclick="refreshCharts()">
+            🔄 Generate New Numbers
+        </button>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <div class="chart-card-label">Column Chart — 20 numbers</div>
+            <div id="bar-container"></div>
+        </div>
+        <div class="chart-card">
+            <div class="chart-card-label">Pie Chart <span class="badge-fn">show()</span></div>
+            <div id="pie-container"></div>
+        </div>
+    </div>
+
+    <footer>DIC4 · Flask + python-highcharts demo</footer>
+
+    <script>
+        // ── Initial chart data injected by Flask ──────────────────────────────────
+        let barOpts = {{ bar_opts | safe }};
+        let pieOpts = {{ pie_opts | safe }};
+
+        // Hold chart references so we can destroy & recreate them
+        let barChart = Highcharts.chart("bar-container", barOpts);
+        let pieChart = Highcharts.chart("pie-container", pieOpts);
+
+        // ── Refresh: call Flask /api/refresh for fresh data ───────────────────────
+        async function refreshCharts() {
+            const btn = document.getElementById("refresh-btn");
+            btn.classList.add("loading");
+            btn.textContent = "⏳ Generating…";
+
+            try {
+                const res = await fetch("/api/refresh");
+                const data = await res.json();
+
+                // Re-render charts
+                if (barChart) barChart.destroy();
+                if (pieChart) pieChart.destroy();
+                barChart = Highcharts.chart("bar-container", data.bar);
+                pieChart = Highcharts.chart("pie-container", data.pie);
+
+                // Update number badges
+                const row = document.getElementById("number-row");
+                row.innerHTML = data.numbers
+                    .map(n => `<span class="num-badge">${n}</span>`)
+                    .join("");
+
+                // Update stats
+                const nums = data.numbers;
+                const total = nums.reduce((a, b) => a + b, 0);
+                const avg = (total / nums.length).toFixed(1);
+                const statVals = document.querySelectorAll("#stats .val");
+                statVals[0].textContent = nums.length;
+                statVals[1].textContent = Math.min(...nums);
+                statVals[2].textContent = Math.max(...nums);
+                statVals[3].textContent = avg;
+                statVals[4].textContent = total;
+            } catch (e) {
+                alert("Refresh failed: " + e.message);
+            } finally {
+                btn.classList.remove("loading");
+                btn.textContent = "🔄 Generate New Numbers";
+            }
+        }
+    </script>
+</body>
+
+</html>
